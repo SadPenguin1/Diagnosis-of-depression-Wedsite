@@ -1,0 +1,24 @@
+
+<header id="header" th:fragment="header" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<div class="top">
+		<div class="container">
+			<div class="row">
+				<nav id="navigation">
+					<ul class="no-style menu">
+						<li sec:authorize="!isAuthenticated()"><a th:href="@{/dang-nhap}" th:text="#{text.login}"></a></li>
+						<li sec:authorize="isAuthenticated()"><a th:href="@{/dang-xuat}" th:text="#{text.logout}"></a></li>
+					</ul>
+				</nav>
+				<div class="header_mobile_menu">
+					<div class="nav_btn">
+						<span></span> <span></span> <span></span>
+					</div>
+					<ul class="no-style menu">
+						<li sec:authorize="!isAuthenticated()"><a th:href="@{/dang-nhap}" th:text="#{text.login}"></a></li>
+						<li sec:authorize="isAuthenticated()"><a th:href="@{/dang-xuat}" th:text="#{text.logout}"></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>

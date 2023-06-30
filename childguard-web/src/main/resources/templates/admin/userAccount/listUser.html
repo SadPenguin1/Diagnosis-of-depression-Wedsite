@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="admin/common/template">
+<head>
+<meta charset="UTF-8" />
+<title th:text="#{user.list.title}"></title>
+</head>
+<body>
+	<div layout:fragment="content" th:remove="tag">
+		<div class="row">
+			<div class="col-12">
+				<div class="card m-b-30">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6 col-sm-6">
+								<h4 class="mt-0 header-title" th:text="#{user.list.title}"></h4>
+							</div>
+							<div class="col-md-6 col-sm-6">
+								<!-- <a class="pull-right btn btn-primary" th:href="@{/admin/account/add}"><img th:src="@{/user/images/add.png}" height="20" />Thêm mới</a> --> <a
+									data-toggle="modal" href="" data-target="#confirm-export-exel" class="pull-right btn btn-success"><img
+									th:src="@{/user/images/export-exel.png}" height="20" />Xuất Excel</a>
+							</div>
+						</div>
+						<hr />
+						<div class="table-responsive">
+							<table id="datatable" class="table table-bordered">
+								<thead>
+									<tr>
+										<th></th>
+										<th th:text="'ID'"></th>
+										<th th:text="#{user.name}"></th>
+										<th th:text="#{user.phone}"></th>
+										<th th:text="#{user.age}"></th>								
+										<th>Thông Tin</th>
+										<th th:text="#{text.option}"></th>
+									</tr>
+								</thead>
+								<tfoot>
+									<tr>
+										<td colspan="7"><button id="delButt" class="btn btn-danger">
+												<i class="fa fa-trash"></i>Xóa tất
+											</button></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" th:text="#{user.delete.confirm.message}"></div>
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.no}"></button>
+						<a class="btn btn-danger btn-ok" style="color: white;" th:text="#{text.delete}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-lock" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" th:text="#{user.lock.confirm.message}"></div>
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.no}"></button>
+						<a class="btn btn-danger btn-ok" style="color: white;" th:text="#{text.lock}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-export-exel" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.no}"></button>
+						<a class="btn btn-success btn-ok" style="color: white;" th:text="#{text.yes}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-unlock" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" th:text="#{user.unlock.confirm.message}"></div>
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.no}"></button>
+						<a class="btn btn-danger btn-ok" style="color: white;" th:text="#{text.unlock}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-delete-multi" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header" th:text="#{user.delete.confirm.message}"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.no}"></button>
+						<button class="btn btn-danger btn-ok" style="color: white;" th:text="#{text.delete}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="please-select-dialog" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">Vui lòng tích chọn các dòng để xoá?</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" th:text="#{text.cancel}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" th:inline="javascript">
+		var vietnameseUrl = [[@{/user/plugins/datatables/Vietnamese.json}]];
+	    var url = [[@{/admin/accounts}]];
+	    var editUrl = [[@{/admin/account/update}]];
+	    var resetPasswordUrl = [[@{/admin/account/reset-password}]];
+	    var delUrl = [[@{/admin/account/delete}]];
+	    var delMultiUrl = [[@{/admin/account/delete-multi}]];
+	    var lockUrl = [[@{/admin/account/change-lock}]];
+	    var imageUrl = [[@{/user/image/}]];
+	    var exportExelUrl = [[@{/admin/excel/export}]]
+	    var downloadExelUrl = [[@{/user/file/}]];
+	    var searchDTO = {};
+	    
+	    var status = [[#{user.status}]];
+	    var disabled = [[#{user.status.disabled}]];
+	    var enabled = [[#{user.status.enabled}]];
+	    var all = [[#{user.status.all}]];
+	    var csrf_token = [[${_csrf.token}]];
+	    var searchHolderText = [[#{user.search.holder}]];
+	    
+	    var amountTxt = [[#{user.amount}]];
+	    
+	    var id = "";
+	    var table;
+		$(document).ready(function() {
+			table = $('#datatable').DataTable( {
+				"processing": true,
+		        "serverSide": true,
+		        "ajax": {
+		        	type:"POST",
+		            url: url,
+		            dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: function ( d ) {
+		            	if (typeof $('#accountStatus') != 'undefined') {
+		            		if ($('#accountStatus').val() == '' || $('#accountStatus').val() == undefined) {
+		            			d.roleList = [1,2]
+		            		} else {
+		            			var roleId = parseInt($('#accountStatus').val());
+		            			d.roleList = [roleId];
+		            		}
+		            	} else {
+		            		d.roleList = [1,2];
+		            	}
+		            	searchDTO = d;
+		            	return JSON.stringify( d );
+		            }
+		        },
+		        "lengthMenu": [10, 25, 50, 100, 200],
+		        "columns": [
+		            { "data": "id" },
+		            { "data": "id" },
+		            { "data": "name" },
+		            { "data": "phone" },
+		            { "data": "age" },
+		            {  	
+		            	"className":      'details-control',
+		                "orderable":      false,
+		                "data":           "informationDTO",
+		                "defaultContent": '',
+		                "render": function ( data, type, row ) {
+		                	return ' Thông tin';
+		                }
+		            },
+		            { "data": "id" }
+		        ],
+		        "order": [1, "desc"],
+		        "select": {
+		        	'style': 'multi'
+		        },
+		        "columnDefs": [
+					{
+					    'targets': 0,
+					    'checkboxes': {
+					       'selectRow': true
+					    }
+					},
+					{
+	   	                "render": function ( data, type, row ) {
+	   	                	var content =  data;
+				            if (row.roleId == 1) {
+				            	content = data + " - ADMIN";
+				            }
+	   	                    return content;
+	   	                },
+						"orderable" : false,
+	   	                "targets": 1	
+	  	            },
+     		     	{
+   	                "render": function ( data, type, row ) {
+   	                	var content =  '';
+   	                	content += '<button id="editButt" class="btn btn-primary"><i class="fa fa-pencil-alt"></i>Sửa</button>'
+	              		content +='<button class="btn btn-danger" data-toggle="modal" data-target="#confirm-delete" data-name='+ encodeURI(row.name)+' data-phone='+row.phone+'><i class="fa fa-trash"></i>Xóa</button>'
+	              		content +='<button id="resetPasswordButt" class="btn btn-info"><i class="fa fa-key"></i>Đổi mật khẩu</button>';
+			            if (row.enabled) {
+			            	content += '<button class="btn btn-warning" data-toggle="modal" data-target="#confirm-lock" data-name='+encodeURI(row.name)+' data-phone='+row.phone+'><i class="fa fa-lock"></i>Khóa</button>';
+			            } else {
+			            	content += '<button class="btn btn-warning" data-toggle="modal" data-target="#confirm-unlock" data-name='+encodeURI(row.name)+' data-phone='+row.phone+'><i class="fa fa-unlock"></i>Mở Khóa</button>';
+			            }
+   	                    return content;
+   	                },
+					"orderable" : false,
+   	                "targets": 6	
+  	            	}
+		        ],
+		        "language": {
+		            "url": vietnameseUrl,
+		            "searchPlaceholder": searchHolderText
+		        },
+		        "initComplete": function(settings, json) {
+		        	$("#datatable_filter").prepend( '<label>Nhóm: <select id="accountStatus" class="form-control form-control-sm" aria-controls="datatable"><option value="">Tất cả</option><option value="1">ADMIN</option><option value="2">HỌC SINH</option></select></label>');
+					$('#accountStatus').change(function (e) {
+				        table.draw();
+				    });
+		          }
+	        });
+			
+			function formatExam ( d ) {
+				id = d.id;//set id cho dong
+			    var content =  '<table class="table table-bordered" style="margin:0px;padding:0px;">';
+			    content += '<tr>'+
+			            '<th>Trường</th>'+	
+			            '<th>Khối</th>'+		  
+			            '<th>Lớp</th>'+		  
+			            '<th>Giới Tính</th>'+
+			        '</tr>';
+			    	var obj = d.informationDTO;
+			    	content += '<tr>'+
+			            '<td>' + obj.address + '</td>'+
+			            '<td>' + obj.grade + '</td>'+
+			            '<td>' + obj.classz + '</td>'+
+			            '<td>' + obj.gender + '</td>'+
+			        '</tr>';
+		         content +=  '</table>';
+		         
+		         return content;
+			}
+			
+			$('#datatable tbody').on( 'click', 'button', function () {
+				var data = table.row( $(this).parents('tr') ).data();
+				id = data.id;
+				if ($(this).prop("id") == 'editButt') {
+					window.location.href = editUrl + "/" + id;
+				}
+				if ($(this).prop("id") == 'resetPasswordButt') {
+					window.location.href = resetPasswordUrl + "/" + id;
+				}  
+		    } );
+			
+			$('#datatable tbody').on('click', 'td.details-control', function () {
+		        var tr = $(this).closest('tr');
+		        var row = table.row( tr );
+		 
+		        if ( row.child.isShown() ) {
+		            row.child.hide();
+		            tr.removeClass('shown');
+		        }
+		        else {
+		            // Open this row
+		            row.child(formatExam(row.data())).show();
+		            tr.addClass('shown');
+		        }
+		    } );
+			$('#confirm-export-exel').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $modalDiv.find('div.modal-body').html('<strong>Đang tạo file excel. Vui lòng đợi chút nhé!</strong>');
+				  $.ajax({
+				        url: exportExelUrl,
+				        method: 'POST',
+				        dataType: 'text',
+				        contentType: 'application/json;charset=UTF-8',
+				        headers: {'X-CSRF-TOKEN': csrf_token},
+			            data: JSON.stringify(searchDTO),
+				        success: function (data) {
+				            $modalDiv.modal('hide');
+				        	window.location.href=downloadExelUrl + data;
+				        }
+				    });
+				});
+			
+			$('#confirm-export-exel').on('show.bs.modal', function(e) {
+			    $(e.currentTarget).find('div.modal-body').html('<strong>Bạn muốn xuất danh sách người dùng ra exel?</strong>');
+			});
+			
+			$('#confirm-delete').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $.get(delUrl + '/' + id).then(function() {
+				     $modalDiv.modal('hide');
+				     table.draw();
+				  }, function() {
+					    alert( "Người dùng đang sử dụng!" );
+				  });
+				});
+			
+			$('#confirm-export').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $.get(exportUrl + '/' + id).then(function() {
+				     $modalDiv.modal('hide');
+				     table.draw();
+				  });
+				});
+			
+			//triggered when modal is about to be shown
+			$('#confirm-export').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var name = $(e.relatedTarget).data('name');
+			    //populate the textbox
+			    $(e.currentTarget).find('div.modal-body').html('<strong>' + decodeURI(name) + '</strong>');
+			});
+					
+			$('#confirm-unlock').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $.get(lockUrl + '/' + id).then(function() {
+				     $modalDiv.modal('hide')
+				     table.draw();
+				  });
+				});
+			$('#confirm-lock').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $.get(lockUrl + '/' + id).then(function() {
+				     $modalDiv.modal('hide')
+				     table.draw();
+				  });
+				});
+			//triggered when modal is about to be shown
+			$('#confirm-delete').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var name = $(e.relatedTarget).data('name');
+			    var phone = $(e.relatedTarget).data('phone');
+			    //populate the textbox
+			    $(e.currentTarget).find('div.modal-body').html('<strong>' + decodeURI(name) + ' - ' + phone + '</strong>');
+			});
+			$('#confirm-lock').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var name = $(e.relatedTarget).data('name');
+			    var phone = $(e.relatedTarget).data('phone');
+			    //populate the textbox
+			    $(e.currentTarget).find('div.modal-body').html('<strong>' + decodeURI(name) + ' - ' + phone + '</strong>');
+			});
+			$('#confirm-unlock').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var name = $(e.relatedTarget).data('name');
+			    var phone = $(e.relatedTarget).data('phone');
+			    //populate the textbox
+			    $(e.currentTarget).find('div.modal-body').html('<strong>' + decodeURI(name) + ' - ' + phone + '</strong>');
+			});
+			
+	    });
+		// Handle form submission event
+		var rowIds = [];
+		$('#delButt').on('click', function(e){
+		    var rows_selected = table.column(0).checkboxes.selected();
+		    rowIds = [];
+		    // Iterate over all selected checkboxes
+		    $.each(rows_selected, function(index, rowId){
+		       // Create a hidden element
+		       rowIds.push(rowId);
+		    });
+		    if (rows_selected.length == 0) {
+		    	$("#please-select-dialog").modal('show');
+		    } else {
+		    	$("#confirm-delete-multi").modal('show');
+		    }
+	 	});
+		$('#confirm-delete-multi').on('click', '.btn-ok', function(e) {
+			  var $modalDiv = $(e.delegateTarget);
+			  $.get(delMultiUrl + '/' + rowIds.toString()).then(function() {
+				  $modalDiv.modal('hide');
+				  table.draw();
+		      });
+		});
+	</script>
+	</div>
+</body>
+</html>

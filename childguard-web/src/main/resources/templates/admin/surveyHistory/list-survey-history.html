@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="admin/common/template">
+<head>
+<meta charset="UTF-8" />
+<title th:text="#{surveyHistory.list.title}"></title>
+</head>
+<body>
+	<div layout:fragment="content" th:remove="tag">
+		<script>
+			$(function() {
+				$("#fromDate").datetimepicker({
+					format : 'd/m/Y',
+					timepicker : false
+				});
+				$("#toDate").datetimepicker({
+					format : 'd/m/Y',
+					timepicker : false
+				});
+			});
+		</script>
+		<div class="row">
+			<div class="col-12">
+				<div class="card m-b-30">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6 col-sm-6">
+								<h4 class="mt-0 header-title"
+									th:text="#{surveyHistory.list.title}"></h4>
+							</div>
+
+							<div class="col-md-6 col-sm-6">
+								<a data-toggle="modal" href=""
+									data-target="#confirm-export-exel"
+									class="pull-right btn btn-success"><img
+									th:src="@{/user/images/export-exel.png}" height="20" />Xuất
+									Excel</a>
+							</div>
+						</div>
+						<hr />
+						<div class="form-group row">
+							<div class="col-sm-3">
+								<div class="form-group">
+									<label class="control-label" th:text="'Từ ngày'"></label>: <input
+										id="fromDate" th:placeholder="'Từ ngày'"
+										class="form-control form-control-sm" />
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="form-group">
+									<label class="control-label" th:text="'Tới ngày'"></label>: <input
+										id="toDate" th:placeholder="'Tới ngày'"
+										class="form-control form-control-sm" />
+								</div>
+							</div>
+							<div class="col-sm-3">
+								<div class="form-group">
+									<label class="control-label">Số Điện Thoại</label>
+									<input id="phone" class="form-control form-control-sm"
+										type="text" th:placeholder="'Số điện thoại'" />
+								</div>
+							</div>
+						</div>
+						<hr />
+						<div class="table-responsive">
+							<table id="datatable" class="table table-bordered">
+								<thead>
+									<tr>
+										<th></th>
+										<th>ID</th>
+										<th>Mã Câu Hỏi</th>
+										<th th:text="#{surveyHistory.question}"></th>
+										<th th:text="#{surveyHistory.answer}"></th>
+										<th>Điểm</th>
+										<th th:text="#{surveyHistory.created_date}"></th>
+										<th>Người tạo</th>
+										<th>Số Điện Thoại</th>
+										<th th:text="#{text.option}"></th>
+									</tr>
+								</thead>
+								<tfoot>
+									<tr>
+										<td colspan="10"><button id="delButt"
+												class="btn btn-danger">
+												<i class="fa fa-trash"></i>Xóa tất
+											</button></td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-delete" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header"
+						th:text="#{surveyHistory.delete.confirm.message}"></div>
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.no}"></button>
+						<a class="btn btn-danger btn-ok" style="color: white;"
+							th:text="#{text.delete}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-delete-multi" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header"
+						th:text="#{surveyHistory.delete.confirm.message}"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.no}"></button>
+						<button class="btn btn-danger btn-ok" style="color: white;"
+							th:text="#{text.delete}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="confirm-export-exel" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body"></div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.no}"></button>
+						<a class="btn btn-success btn-ok" style="color: white;"
+							th:text="#{text.yes}"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="please-select-dialog" tabindex="-1"
+			role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-body">Vui lòng tích chọn các dòng để xoá?</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal"
+							th:text="#{text.cancel}"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" th:inline="javascript">
+		var vietnameseUrl = [[@{/user/plugins/datatables/Vietnamese.json}]];
+	    var url = [[@{/admin/survey-histories}]];
+	    var delUrl = [[@{/admin/survey-history/delete}]];
+	    var delMultiUrl = [[@{/admin/survey-history/delete-multi}]];
+	    var exportExelUrl = [[@{/admin/survey-history/excel/export}]];
+	    var downloadExelUrl = [[@{/survey-history/file/}]];
+	    var csrf_token = [[${_csrf.token}]];
+	    var searchHolderText = [[#{surveyHistory.search.title}]];
+	    var searchDTO = {};
+	    
+	    var id = "";
+	    var table;
+	    $(document).ready(function() {
+			table = $('#datatable').DataTable( {
+				"processing": true,
+		        "serverSide": true,
+		        "ajax": {
+		        	type:"POST",
+		            url: url,
+		            dataType: "json",
+		            contentType: "application/json",
+		            headers: {'X-CSRF-TOKEN': csrf_token},
+		            data: function ( d ) {
+		            	if (typeof $('#phone') != 'undefined') {
+	            			d.phone = $('#phone').val();
+	            		}
+		            	if (typeof $('#toDate') != 'undefined') {
+		            		d.toDate = $('#toDate').val();
+		            	}
+		            	if (typeof $('#fromDate') != 'undefined') {
+		            		d.fromDate = $('#fromDate').val();
+		            	}
+		        	    searchDTO = d;
+		            	return JSON.stringify( d );
+		            }
+		        },
+		        "lengthMenu": [10, 25, 50, 100, 200],
+		        "columns": [
+					{ "data": "id" },
+					{ "data": "id" },
+		            { "data": "code" },
+		            { "data": "question" },
+		            { "data": "answer" },
+		            { "data": "score" },
+		            { "data": "createdDate"},
+		            /* { "data": "createdBy.phone" }, */
+		            {"data": "username"},
+		            {"data": "phone"},
+		            {"data": "id" }
+		        ],
+		        "order": [1, "desc"],
+		        "select": {
+		        	'style': 'multi'
+		        },
+		        "columnDefs": [
+				{
+				    'targets': 0,
+				    'checkboxes': {
+				       'selectRow': true
+				    }
+				},
+	            {
+	                "render": function ( data, type, row ) {
+	                    var content = '';
+	                    content +='<button class="btn btn-danger" data-toggle="modal" data-target="#confirm-delete" data-id=' + encodeURI(row.id)+ '><i class="fa fa-trash"></i>Xóa</button>';
+			            return content;
+	                },
+	                "orderable": false,
+	                "targets": 9
+	            }
+		        ],
+		        "language": {
+		            "url": vietnameseUrl,
+		            searchPlaceholder: searchHolderText
+		        },
+		        "initComplete": function(settings, json) {
+					$('#phone').keyup(function (e) {
+				        table.draw();
+				    });
+					$('#province').keyup(function (e) {
+				        table.draw();
+				    });
+					$('#fromDate').change(function (e) {
+				        table.draw();
+				    });
+					$('#toDate').change(function (e) {
+				        table.draw();
+				    });
+		        }
+	        });
+			
+			$('#datatable tbody').on( 'click', 'button', function () {
+				var data = table.row( $(this).parents('tr') ).data();
+				id = data.id;
+		    });
+			
+			$('#confirm-export-exel').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $modalDiv.find('div.modal-body').html('<strong>Đang tạo file excel. Vui lòng đợi chút nhé!</strong>');
+				  $.ajax({
+				        url: exportExelUrl,
+				        method: 'POST',
+				        dataType: 'text',
+				        contentType: 'application/json;charset=UTF-8',
+				        headers: {'X-CSRF-TOKEN': csrf_token},
+			            data: JSON.stringify(searchDTO),
+				        success: function (data) {
+				            $modalDiv.modal('hide');
+				        	window.location.href=downloadExelUrl + data;
+				        }
+				    });
+				});
+			
+			$('#confirm-export-exel').on('show.bs.modal', function(e) {
+			    $(e.currentTarget).find('div.modal-body').html('<strong>Bạn muốn xuất danh sách người dùng ra exel?</strong>');
+			});
+			
+			$('#confirm-delete').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  console.log(id);
+				  $.get(delUrl + '/' + id).then(function() {
+				     $modalDiv.modal('hide');
+				     table.draw();
+				  });
+				});
+			
+			//triggered when modal is about to be shown
+			$('#confirm-delete').on('show.bs.modal', function(e) {
+			    //get data-id attribute of the clicked element
+			    var id = $(e.relatedTarget).data('id');
+			    //populate the textbox
+			    $(e.currentTarget).find('div.modal-body').html('<strong> ID: ' + decodeURI(id) + '</strong>');
+			});
+			// Handle form submission event
+			var rowIds = [];
+			$('#delButt').on('click', function(e){
+			    var rows_selected = table.column(0).checkboxes.selected();
+			    rowIds = [];
+			    // Iterate over all selected checkboxes
+			    $.each(rows_selected, function(index, rowId){
+			       // Create a hidden element
+			       rowIds.push(rowId);
+			    });
+			    if (rows_selected.length == 0) {
+			    	$("#please-select-dialog").modal('show');
+			    } else {
+			    	$("#confirm-delete-multi").modal('show');
+			    }
+		 	});
+			$('#confirm-delete-multi').on('click', '.btn-ok', function(e) {
+				  var $modalDiv = $(e.delegateTarget);
+				  $.get(delMultiUrl + '/' + rowIds.toString()).then(function() {
+					  $modalDiv.modal('hide');
+					  table.draw();
+			      });
+			});
+	    });
+	</script>
+	</div>
+</body>
+</html>

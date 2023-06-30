@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="admin/common/template">
+<head>
+<meta charset="UTF-8" />
+<title th:text="'Cài đặt'"></title>
+</head>
+<body>
+	<div layout:fragment="content" th:remove="tag">
+		<div class="row">
+			<div class="col-12">
+				<div class="card m-b-30">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6 col-sm-6">
+								<h4 class="mt-0 header-title" th:text="'Cài đặt'"></h4>
+							</div>
+						</div>
+						<hr />
+						<div>
+							<div class="modal-dialog " id="update-setting" onsubmit="updateForm(); return false;">
+								<div class="modal-content white-box">
+									<div class="modal-body">
+										<form class="form-material">
+											<div class="form-group row">
+												<label class="col-3 form-label">Ẩn khảo sát:</label>
+												<div class="col-9">
+													<input class="form-control" type="checkbox" id="hideSurvey" name="hideSurvey" />
+												</div>
+											</div>
+											<div class="form-group">
+												<button type="submit" class="btn btn-primary">
+													<i class="ti-save"></i> Cập Nhật
+												</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" th:inline="javascript">
+		var url = [[@{/api/member/setting/1}]];
+		var editUrl = [[@{/api/admin/setting/update}]];
+		var csrf_token = [[${_csrf.token}]];
+		
+		$(document).ready(function () {
+			$.ajax({
+				url: url,
+				type: 'GET',
+				dataType: "json",
+				contentType: "application/json",
+				headers: {'X-CSRF-TOKEN': csrf_token},
+				success: function (data) {
+					$("#update-setting #hideSurvey").prop('checked', data.hideSurvey);
+				},
+				error: function () {
+					alert("Loi xay ra");
+				}
+			});
+		});
+
+		function updateForm(form) {
+			parseNumber();
+			//convert form fields to json object
+			var data = {id: 1};
+			$("#update-setting form").serializeArray().map(function (x) {
+              data[x.name] = x.value;
+          	});
+			data.hideSurvey = $("#update-setting #hideSurvey").is(":checked")
+			$.ajax({
+		        url : editUrl,
+		        type: 'PUT',
+		        dataType: "text",
+	            contentType: "application/json",
+	            headers: {'X-CSRF-TOKEN': csrf_token},
+		        data: JSON.stringify(data),
+		        success: function(){
+		        	$("#update-setting #hideSurvey").prop('checked', data.hideSurvey);
+		        	alert("Cập nhật thành công!");
+			    }
+		    });
+			return false;
+		}
+	</script>
+	</div>
+</body>
+</html>
